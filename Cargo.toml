@@ -1,0 +1,15 @@
+[package]
+name = "org_blog"
+version = "0.1.0"
+authors = ["lichong <lc@molasync.com>"]
+
+[dependencies]
+time = "0.1.35"
+iron = "*"
+staticfile = "*"
+
+[dependencies.mount]
+
+git = "https://github.com/iron/mount.git"
+[dependencies.bodyparser]
+git = "https://github.com/iron/body-parser.git"
