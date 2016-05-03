@@ -1,33 +1,38 @@
+/// 
+/// A blog just offer static html in some folders
+///
+
 extern crate iron;
-extern crate time;
 extern crate staticfile;
 extern crate router;
 extern crate mount;
 extern crate logger;
 
 use iron::prelude::*;
-use router::Router;
 use std::path;
 use staticfile::Static;
 use mount::Mount;
 use logger::Logger;
 
 mod routers;
+mod utils;
+
+fn link_before(chain: &mut Chain) {
+    let (logger_before, logger_after) = Logger::new(None);
+    chain.link_before(logger_before);
+    //chain.link_before(utils::BeforeParams);
+    chain.link_after(logger_after);
+}
 
 fn main() {
-    let mut router = Router::new();
-
-    router.get("/", routers::index);
-    router.post("/api", routers::api);
-
-    let mut mount = Mount::new();
-    mount.mount("/", router)
-        .mount("/public/", Static::new(path::Path::new("target/public/")));
+    let api_router = routers::api::Router::new();
     
-    let (logger_before, logger_after) = Logger::new(None);
+    let mut mount = Mount::new();
+    mount.mount("/", Static::new(path::Path::new("blog/")))
+        .mount("/api", api_router);
     
     let mut chain = Chain::new(mount);
-    chain.link_before(logger_before);
-    chain.link_after(logger_after);
+    link_before(&mut chain);
+
     Iron::new(chain).http("localhost:3000").unwrap();
 }

@@ -4,17 +4,10 @@ version = "0.1.0"
 authors = ["lichong <lc@molasync.com>"]
 
 [dependencies]
-time = "0.1.35"
 staticfile = "*"
+iron = "*"
+mount = "*"
 router = "*"
 logger = "*"
-
-[dependencies.iron]
-version = "*"
-
-[dependencies.mount]
-git = "https://github.com/iron/mount.git"
-
-[dependencies.bodyparser]
-git = "https://github.com/iron/body-parser.git"
-
+bodyparser = "*"
+urlencoded = "*"
