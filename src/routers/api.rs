@@ -1,6 +1,8 @@
 extern crate iron;
 extern crate router;
 extern crate urlencoded;
+extern crate serde;
+extern crate serde_json;
 
 
 use iron::prelude::*;
@@ -8,7 +10,7 @@ use self::urlencoded::UrlEncodedQuery;
 use std::collections::HashMap;
 use iron::Handler;
 use utils;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct Router {
     routers: HashMap<String, Box<Handler>>
@@ -43,17 +45,37 @@ impl Handler for Router {
     }
 }
 
+fn paths_to_json_str(files: &Vec<PathBuf>) -> Option<String> {
+    let mut path_strs = Vec::new();
+    for pathbuf in files {
+        let file_name = pathbuf.file_name()
+                .and_then(|s| s.to_str())
+                .map(|os_str| os_str.to_string());
+        if let Some(s) = file_name {
+            path_strs.push(s);
+        }
+    }
+    let s = serde_json::to_string(&path_strs);
+    s.ok()
+}
+
 fn list_blog(_: &mut Request) -> IronResult<Response> {
     let path = Path::new("./public/");
     let results = utils::ls_html(&path);
     let response = match results {
         Err(err) => {
             println!("list blog failed with error: {:?}", err);
-            "can't ls blog".to_string()
+            "{code = -1}".to_string()
         },
-        Ok(files) => {
+        Ok(ref files) => {
             println!("list blog with {:?}", files);
-            "find blog".to_string()
+            let json_str = paths_to_json_str(files);
+            if let Some(s) = json_str {
+                s
+            }
+            else {
+                "{code = -1}".to_string()
+            }
         },
     };
 

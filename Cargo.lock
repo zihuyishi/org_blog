@@ -7,6 +7,8 @@ dependencies = [
  "logger 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "mount 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "router 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "staticfile 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "urlencoded 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
