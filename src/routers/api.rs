@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use iron::Handler;
 use utils;
 use std::path::{Path, PathBuf};
+use iron::mime::Mime;
 
 pub struct Router {
     routers: HashMap<String, Box<Handler>>
@@ -59,27 +60,33 @@ fn paths_to_json_str(files: &Vec<PathBuf>) -> Option<String> {
     s.ok()
 }
 
+///
+/// list all html in './public'
+/// success {"code" : 0, "list" : []}
+/// fail {"code" : -1}
+///
 fn list_blog(_: &mut Request) -> IronResult<Response> {
     let path = Path::new("./public/");
     let results = utils::ls_html(&path);
     let response = match results {
         Err(err) => {
             println!("list blog failed with error: {:?}", err);
-            "{code = -1}".to_string()
+            "{\"code\" : -1}".to_string()
         },
         Ok(ref files) => {
             println!("list blog with {:?}", files);
             let json_str = paths_to_json_str(files);
             if let Some(s) = json_str {
-                s
+                format!("{{\"code\" : 0, \"list\" : {} }}", s)
             }
             else {
-                "{code = -1}".to_string()
+                "{\"code\" : -1}".to_string()
             }
         },
     };
 
-    Ok(Response::with((iron::status::Ok, response)))
+    let content_type = "application/json".parse::<Mime>().unwrap();
+    Ok(Response::with((content_type, iron::status::Ok, response)))
 }
 
 fn add(req: &mut Request) -> IronResult<Response> {
