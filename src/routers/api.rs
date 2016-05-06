@@ -14,7 +14,7 @@ use std::path::{Path, PathBuf};
 use iron::mime::Mime;
 
 pub struct Router {
-    routers: HashMap<String, Box<Handler>>
+    routers: HashMap<String, Box<Handler>>,
 }
 
 impl Router {
@@ -47,42 +47,39 @@ impl Handler for Router {
 }
 
 fn paths_to_json_str(files: &Vec<PathBuf>) -> Option<String> {
-    let mut path_strs = Vec::new();
-    for pathbuf in files {
-        let file_name = pathbuf.file_name()
-                .and_then(|s| s.to_str())
-                .map(|os_str| os_str.to_string());
-        if let Some(s) = file_name {
-            path_strs.push(s);
-        }
-    }
+    let path_strs: Vec<String> = files.iter()
+                                      .filter_map(|pb| {
+                                          pb.file_name()
+                                            .and_then(|s| s.to_str())
+                                            .map(|os_str| os_str.to_string())
+                                      })
+                                      .collect();
     let s = serde_json::to_string(&path_strs);
     s.ok()
 }
 
 ///
-/// list all html in './public'
+/// list all html in './blog'
 /// success {"code" : 0, "list" : []}
 /// fail {"code" : -1}
 ///
 fn list_blog(_: &mut Request) -> IronResult<Response> {
-    let path = Path::new("./public/");
-    let results = utils::ls_html(&path);
+    let path = Path::new("./blog/");
+    let results = utils::ls_html(path);
     let response = match results {
         Err(err) => {
             println!("list blog failed with error: {:?}", err);
             "{\"code\" : -1}".to_string()
-        },
+        }
         Ok(ref files) => {
             println!("list blog with {:?}", files);
             let json_str = paths_to_json_str(files);
             if let Some(s) = json_str {
                 format!("{{\"code\" : 0, \"list\" : {} }}", s)
-            }
-            else {
+            } else {
                 "{\"code\" : -1}".to_string()
             }
-        },
+        }
     };
 
     let content_type = "application/json".parse::<Mime>().unwrap();

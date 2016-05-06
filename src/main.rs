@@ -20,7 +20,6 @@ mod utils;
 fn link_before(chain: &mut Chain) {
     let (logger_before, logger_after) = Logger::new(None);
     chain.link_before(logger_before);
-    //chain.link_before(utils::BeforeParams);
     chain.link_after(logger_after);
 }
 
@@ -28,7 +27,9 @@ fn main() {
     let api_router = routers::api::Router::new();
     
     let mut mount = Mount::new();
-    mount.mount("/", Static::new(path::Path::new("blog/")))
+    mount.mount("/", Static::new(path::Path::new("public/")))
+        .mount("/js", Static::new(path::Path::new("public/js")))
+        .mount("/blog", Static::new(path::Path::new("blog/")))
         .mount("/api", api_router);
     
     let mut chain = Chain::new(mount);
