@@ -9,7 +9,7 @@ extern crate mount;
 extern crate logger;
 
 use iron::prelude::*;
-use std::path;
+use std::path::Path;
 use staticfile::Static;
 use mount::Mount;
 use logger::Logger;
@@ -27,10 +27,9 @@ fn main() {
     let api_router = routers::api::Router::new();
     
     let mut mount = Mount::new();
-    mount.mount("/", Static::new(path::Path::new("public/")))
-        .mount("/js", Static::new(path::Path::new("public/js")))
-        .mount("/blog", Static::new(path::Path::new("blog/")))
-        .mount("/api", api_router);
+    mount.mount("/", Static::new(Path::new("public/")))
+        .mount("/blog/", Static::new(Path::new("blog/")))
+        .mount("/api/", api_router);
     
     let mut chain = Chain::new(mount);
     link_before(&mut chain);
