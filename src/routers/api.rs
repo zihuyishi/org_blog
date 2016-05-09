@@ -1,17 +1,12 @@
-extern crate iron;
-extern crate router;
-extern crate urlencoded;
-extern crate serde;
-extern crate serde_json;
-
-
 use iron::prelude::*;
-use self::urlencoded::UrlEncodedQuery;
+use urlencoded::UrlEncodedQuery;
 use std::collections::HashMap;
 use iron::Handler;
 use utils;
 use std::path::{Path, PathBuf};
+use iron;
 use iron::mime::Mime;
+use serde_json;
 
 pub struct Router {
     routers: HashMap<String, Box<Handler>>,
