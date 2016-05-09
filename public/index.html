@@ -14,6 +14,10 @@
 		html,
 		body {
 			height: 100%;
+			background-image: url(/img/tianyi.jpg);
+			background-attachment: fixed;
+			background-repeat: no-repeat;
+			background-size: contain;
 		}
 		
 		html,
@@ -26,56 +30,28 @@
 			text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
 		}
 		/**
-		* Sidebar CSS
-		*/
-		
-		#sidebar {
-			background-color: #E57373;
-			padding: 15px;
-		}
-		
-		@media (min-width: 768px) {
-			#sidebar {
-				position: fixed;
-				top: 0;
-				bottom: 0;
-				width: 180px;
-				height: 100%;
-				padding-top: 30px;
-			}
-		}
-		/**
 		* Content CSS
 		*/
 		
 		@media (min-width: 768px) {
 			#content {
-				margin-left: 180px;
+				margin-left: 80px;
 			}
 		}
 	</style>
 </head>
 
 <body>
-	<div id="sidebar">
-		<div class="mui--text-light mui--text-display1 mui--align-vertical">
-			沙耶的博客
-		</div>
-	</div>
 	<div id="content" class="mui-container-fluid">
-		<div class="mui-row">
-			<div class="mui-col-sm-10 mui-col-sm-offset-1">
-				<br><br>
-				<div class="mui--text-dark-secondary mui--text-body2">文章列表</div>
-				<div class="mui-divider"></div>
-				<div id="blog_list">
-					<ul class="mui-table-view">
-						<li class="mui-table-view-cell" v-for="blog in blogs">
-							<a class="mui-navigate-right" href="/blog/{{ blog }}">{{ blog }}</a>
-						</li>
-					</ul>
-				</div>
-			</div>
+		<br><br>
+		<h1>洛天依的博客</h1>
+		<div class="mui-divider"></div>
+		<div id="blog_list">
+			<ul class="mui-table-view">
+				<li class="mui-table-view-cell" v-for="blog in blogs">
+					<a class="mui-navigate-right" href="/blog/{{ blog }}">{{ blog }}</a>
+				</li>
+			</ul>
 		</div>
 	</div>
 	<script src="/js/index.js"></script>
