@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["lichong <lc@molasync.com>"]
 
 [dependencies]
-staticfile = "*"
 iron = "*"
 mount = "*"
 router = "*"
@@ -13,3 +12,7 @@ bodyparser = "*"
 urlencoded = "*"
 serde = "*"
 serde_json = "*"
+
+[dependencies.staticfile]
+version = "*"
+features = ["cache"]
