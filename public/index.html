@@ -49,7 +49,7 @@
 		<div id="blog_list" >
 			<ul class="mui-table-view">
 				<li class="mui-table-view-cell" v-for="blog in blogs">
-					<a class="mui-navigate-right" href="/blog/{{ blog }}">{{ blog }}</a>
+					<a class="mui-navigate-right" href="/blog/{{ blog.url }}">{{ blog.name }}</a>
 				</li>
 			</ul>
 		</div>

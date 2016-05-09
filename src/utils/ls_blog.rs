@@ -2,6 +2,17 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::io;
 
+
+pub fn ls_html(path: &Path) -> io::Result<Vec<PathBuf>> {
+    let cur_dir = fs::read_dir(path);
+    match cur_dir {
+        Err(err) => Err(err),
+        Ok(mut entries) => {
+            Ok(filter_html(&mut entries))
+        }
+    }
+}
+
 fn any_ext(entry: &fs::DirEntry, exts: &Vec<&str>) -> bool {
     let pathbuf = entry.path();
     let ext = pathbuf.extension();
@@ -30,16 +41,6 @@ fn filter_html(dir: &mut fs::ReadDir) -> Vec<PathBuf> {
         }
     }
     results
-}
-
-pub fn ls_html(path: &Path) -> io::Result<Vec<PathBuf>> {
-    let cur_dir = fs::read_dir(path);
-    match cur_dir {
-        Err(err) => Err(err),
-        Ok(mut entries) => {
-            Ok(filter_html(&mut entries))
-        }
-    }
 }
 
 #[test]

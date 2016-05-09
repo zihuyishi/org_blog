@@ -1,12 +1,13 @@
 use iron::prelude::*;
 use urlencoded::UrlEncodedQuery;
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 use iron::Handler;
 use utils;
 use std::path::{Path, PathBuf};
 use iron;
 use iron::mime::Mime;
 use serde_json;
+use serde_json::Value;
 
 pub struct Router {
     routers: HashMap<String, Box<Handler>>,
@@ -41,12 +42,29 @@ impl Handler for Router {
     }
 }
 
+fn pathbuf_to_json(pb: &PathBuf) -> Option<Value> {
+    let fullname = pb.file_name()
+        .and_then(|s| s.to_str())
+        .map(|os_str| os_str.to_string());
+    let filename = pb.file_stem()
+        .and_then(|s| s.to_str())
+        .map(|os_str| os_str.to_string());
+    
+    if let Some(full) = fullname {
+        if let Some(file) = filename {
+            let mut map = BTreeMap::new();
+            map.insert("url".to_string(), Value::String(full));
+            map.insert("name".to_string(), Value::String(file));
+            return Some(Value::Object(map));
+        }
+    }
+    None
+}
+
 fn paths_to_json_str(files: &Vec<PathBuf>) -> Option<String> {
-    let path_strs: Vec<String> = files.iter()
+    let path_strs: Vec<Value> = files.iter()
                                       .filter_map(|pb| {
-                                          pb.file_name()
-                                            .and_then(|s| s.to_str())
-                                            .map(|os_str| os_str.to_string())
+                                          pathbuf_to_json(&pb)
                                       })
                                       .collect();
     let s = serde_json::to_string(&path_strs);
