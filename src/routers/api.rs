@@ -42,56 +42,22 @@ impl Handler for Router {
     }
 }
 
-fn pathbuf_to_json(pb: &PathBuf) -> Option<Value> {
-    let fullname = pb.file_name()
-        .and_then(|s| s.to_str())
-        .map(|os_str| os_str.to_string());
-    let filename = pb.file_stem()
-        .and_then(|s| s.to_str())
-        .map(|os_str| os_str.to_string());
-    
-    if let Some(full) = fullname {
-        if let Some(file) = filename {
-            let mut map = BTreeMap::new();
-            map.insert("url".to_string(), Value::String(full));
-            map.insert("name".to_string(), Value::String(file));
-            return Some(Value::Object(map));
-        }
-    }
-    None
-}
-
-fn paths_to_json_str(files: &Vec<PathBuf>) -> Option<String> {
-    let path_strs: Vec<Value> = files.iter()
-                                      .filter_map(|pb| {
-                                          pathbuf_to_json(&pb)
-                                      })
-                                      .collect();
-    let s = serde_json::to_string(&path_strs);
-    s.ok()
-}
-
 ///
 /// list all html in './blog'
-/// success {"code" : 0, "list" : []}
+/// success {"code" : 0, "list" : [Content]}
+/// where Content is {"url": filepath, "name": filename}
 /// fail {"code" : -1}
 ///
 fn list_blog(_: &mut Request) -> IronResult<Response> {
-    let path = Path::new("./blog/");
-    let results = utils::ls_html(path);
+    let results = utils::ls_blogs();
     let response = match results {
-        Err(err) => {
-            println!("list blog failed with error: {:?}", err);
+        None => {
+            println!("list blog failed");
             "{\"code\" : -1}".to_string()
         }
-        Ok(ref files) => {
-            println!("list blog with {:?}", files);
-            let json_str = paths_to_json_str(files);
-            if let Some(s) = json_str {
-                format!("{{\"code\" : 0, \"list\" : {} }}", s)
-            } else {
-                "{\"code\" : -1}".to_string()
-            }
+        Some(ref json) => {
+            println!("list blog with {}", json);
+            format!("{{\"code\" : 0, \"list\" : {} }}", json)
         }
     };
 

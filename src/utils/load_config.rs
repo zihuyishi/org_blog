@@ -1,3 +1,10 @@
+///
+/// load setting from config.json
+/// # settings
+/// * `port` server port
+/// * 'blog_path' path for search blog
+///
+
 use std::io;
 use std::io::prelude::*;
 use std::io::BufReader;
@@ -52,4 +59,18 @@ pub fn string_by_key(key: &str) -> Option<String> {
     value.and_then(|f| {
         f.as_string().and_then(|s| Some(s.to_string()))
     })
+}
+
+///
+/// help methods
+///
+
+/// Load port from config file
+/// 3000 if no value
+pub fn port() -> i64 {
+    i64_by_key("port").unwrap_or(3000)
+}
+
+pub fn blog_path() -> String {
+    string_by_key("blog_path").unwrap_or("./blog/".to_string())
 }

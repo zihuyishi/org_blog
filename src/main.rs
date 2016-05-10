@@ -10,6 +10,8 @@ extern crate logger;
 extern crate serde_json;
 extern crate urlencoded;
 extern crate serde;
+#[macro_use]
+extern crate lazy_static;
 
 
 use iron::prelude::*;
@@ -40,7 +42,7 @@ fn main() {
     let mut chain = Chain::new(mount);
     link_before(&mut chain);
 
-    let port = utils::load_config::i64_by_key("port").unwrap_or(3000);
+    let port = utils::load_config::port();
     let addr = format!("0.0.0.0:{}", port);
     println!("listening on {}", addr);
     Iron::new(chain).http(addr.as_str()).unwrap();

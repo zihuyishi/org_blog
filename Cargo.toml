@@ -12,6 +12,7 @@ bodyparser = "*"
 urlencoded = "*"
 serde = "*"
 serde_json = "*"
+lazy_static = "0.1.*"
 
 [dependencies.staticfile]
 version = "*"
