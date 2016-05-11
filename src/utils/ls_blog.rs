@@ -2,18 +2,49 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::io;
 use utils;
-use std::sync::Arc;
+use std::sync::{Arc, RwLock};
 use serde_json;
 use serde_json::Value;
 use std::collections::BTreeMap;
+use std::time::SystemTime;
 
 ///
 /// list blogs in config.blog
 /// return a json string
 ///
 pub fn ls_blogs() -> Option<String> {
-    let blogs = G_BLOGS.get();
-    blogs.as_ref().clone()
+    let mut ret = None;
+    let need_update = match G_BLOGS.read() {
+        Ok(blogs) => {
+            let now = SystemTime::now();
+            let last_time = blogs.last_modify_time;
+            let interval = now.duration_since(last_time);
+            match interval {
+                Ok(interval) => {
+                    let out_date = interval.as_secs() > 5 * 60u64;
+                    if !out_date {
+                        ret = blogs.list.as_ref().clone();
+                    }
+                    out_date
+                },
+                Err(_) => false,
+            }
+        },
+        Err(_) => false,
+    };
+    if need_update {
+        println!("update blog");
+        let blog_path = utils::load_config::blog_path();
+        let blog_path = Path::new(&blog_path);
+        let path_list = ls_html(&blog_path).unwrap();
+        ret = paths_to_json_str(&path_list);
+        let result = G_BLOGS.write();
+        if let Ok(mut blogs) = result {
+            println!("write to blogs");
+            blogs.list = Arc::new(ret.clone()).clone();
+        }
+    }
+    ret
 }
 
 fn pathbuf_to_json(pb: &PathBuf) -> Option<Value> {
@@ -87,13 +118,14 @@ fn filter_html(dir: &mut fs::ReadDir) -> Vec<PathBuf> {
 }
 
 lazy_static! {
-    static ref G_BLOGS: BlogsKeeper = BlogsKeeper::new();
+    static ref G_BLOGS: RwLock<BlogsKeeper> = RwLock::new(BlogsKeeper::new());
 }
 
 type BKValue = Option<String>;
 
 struct BlogsKeeper {
     list: Arc<BKValue>,
+    last_modify_time: SystemTime,
 }
 
 impl BlogsKeeper {
@@ -102,13 +134,10 @@ impl BlogsKeeper {
         let blog_path = Path::new(&blog_path);
         let path_list = ls_html(&blog_path).unwrap();
         let json = paths_to_json_str(&path_list);
-        BlogsKeeper { list: Arc::new(json) }
-    }
-    fn get(&self) -> Arc<BKValue> {
-        self.list.clone()
-    }
-    fn set(&mut self, v: Arc<BKValue>) {
-        self.list = v.clone();
+        BlogsKeeper {
+            list: Arc::new(json).clone(),
+            last_modify_time: SystemTime::now(),
+        }
     }
 }
 

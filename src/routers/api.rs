@@ -1,13 +1,10 @@
 use iron::prelude::*;
 use urlencoded::UrlEncodedQuery;
-use std::collections::{HashMap, BTreeMap};
+use std::collections::HashMap;
 use iron::Handler;
 use utils;
-use std::path::{Path, PathBuf};
 use iron;
 use iron::mime::Mime;
-use serde_json;
-use serde_json::Value;
 
 pub struct Router {
     routers: HashMap<String, Box<Handler>>,
