@@ -33,16 +33,19 @@ pub fn ls_blogs() -> Option<String> {
         Err(_) => false,
     };
     if need_update {
-        println!("update blog");
-        let blog_path = utils::load_config::blog_path();
-        let blog_path = Path::new(&blog_path);
-        let path_list = ls_html(&blog_path).unwrap();
-        ret = paths_to_json_str(&path_list);
-        let result = G_BLOGS.write();
-        if let Ok(mut blogs) = result {
-            println!("write to blogs");
-            blogs.list = Arc::new(ret.clone()).clone();
-        }
+        ret = update_cache_blogs();
+    }
+    ret
+}
+
+fn update_cache_blogs() -> Option<String> {
+    let blog_path = utils::load_config::blog_path();
+    let blog_path = Path::new(&blog_path);
+    let path_list = ls_html(&blog_path).unwrap();
+    let ret = paths_to_json_str(&path_list);
+    let result = G_BLOGS.write();
+    if let Ok(mut blogs) = result {
+        blogs.list = Arc::new(ret.clone()).clone();
     }
     ret
 }
